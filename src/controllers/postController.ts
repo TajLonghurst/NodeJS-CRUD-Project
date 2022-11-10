@@ -1,12 +1,18 @@
-import express, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import Post from "../models/postModel";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-  } catch (err) {}
+    const getPosts = await Post.find();
+    res.status(200).json({
+      post: getPosts,
+    });
+  } catch (err: any) {
+    next(err);
+  }
 };
 
-const addPost = async (req: Request, res: Response, next: NextFunction) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, imageUrl, content, creator } = req.body;
     const post = new Post({
@@ -19,23 +25,53 @@ const addPost = async (req: Request, res: Response, next: NextFunction) => {
     res.status(201).json({
       post: createdPost,
     });
-  } catch (err) {
-    res.status(500).json({
-      err: err,
-    });
-    const error = new Error(err as any);
-    console.log(error);
+  } catch (err: any) {
+    next(err);
   }
 };
 
-const editPost = async (req: Request, res: Response, next: NextFunction) => {
+const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-  } catch (err) {}
+    const postId = req.params.postId;
+    const { title, imageUrl, content, creator } = req.body;
+    const post = await Post.findById(postId);
+    if (!post) {
+      const error = new Error("Post Id not recinzied");
+      //   error.statusCode = 404;
+      throw error;
+    }
+    post.set({
+      title: title,
+      imageUrl: imageUrl,
+      content: content,
+      creator: creator,
+    });
+    const updatedPost = await post.save();
+    res.status(200).json({
+      post: updatedPost,
+    });
+  } catch (err: any) {
+    next(err);
+  }
 };
 
 const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-  } catch (err) {}
+    const postId = req.params.postId;
+    const post = await Post.findById(postId);
+    if (!post) {
+      const error = new Error("Failed to find Post with matching Id");
+      //   error.statusCode = 404;
+      throw error;
+    }
+    const result = await Post.findByIdAndRemove(postId);
+    res.status(200).json({
+      message: "Posted Deleted From database",
+      postRemoved: result,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-export default { getPosts, addPost, editPost, deletePost };
+export default { getPosts, createPost, updatePost, deletePost };

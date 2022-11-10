@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import postRoutes from "./routes/postRoute";
 import mongoose from "mongoose";
 
@@ -16,15 +16,22 @@ app.use((req, res, next) => {
 
 app.use("/api/post", postRoutes);
 
-try {
-  const connectDB = async () => {
-    await mongoose.connect(
-      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nodejs-crud-project.ihi4s8t.mongodb.net/${process.env.MONGODB_DB}`
-    );
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
+});
+
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nodejs-crud-project.ihi4s8t.mongodb.net/${process.env.MONGODB_DB}`
+  )
+  .then(() => {
     app.listen(process.env.PORT || 5000);
     console.log("MongoDB Connnect");
-  };
-  connectDB();
-} catch (err) {
-  console.log("MongoDB Connection Failed", err);
-}
+  })
+  .catch((err) => {
+    console.log("MongoDB Connection Failed", err);
+  });
