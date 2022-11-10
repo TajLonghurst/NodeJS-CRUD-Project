@@ -81,7 +81,7 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
       throw error;
     }
     const result = await Post.findByIdAndRemove(postId);
-    const user = await User.findById(""); //Need to find the correct userID
+    const user = await User.findById("636cfca2a367346c8e4f96e7"); //Need to find the correct userID. Need to watch the Udemy Video for why he uses Req.userId
     console.log(user);
     if (!user) {
       const error = new Error("Failed to find user with matching Id");
