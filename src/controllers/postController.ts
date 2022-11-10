@@ -3,11 +3,17 @@ import Post from "../models/postModel";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const getPosts = await Post.find();
+    const posts = await Post.find();
+    if (!posts) {
+      const error = new Error("Could not find posts");
+      throw error;
+    }
     res.status(200).json({
-      post: getPosts,
+      posts: posts,
     });
   } catch (err: any) {
+    err.message = "Failed to find posts";
+    err.statusCode = 404;
     next(err);
   }
 };
@@ -26,6 +32,8 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
       post: createdPost,
     });
   } catch (err: any) {
+    err.message = "Failed to Create Post";
+    err.statusCode = 404;
     next(err);
   }
 };
@@ -36,8 +44,7 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     const { title, imageUrl, content, creator } = req.body;
     const post = await Post.findById(postId);
     if (!post) {
-      const error = new Error("Post Id not recinzied");
-      //   error.statusCode = 404;
+      const error = new Error("updatePost Controller Could not find postId");
       throw error;
     }
     post.set({
@@ -51,6 +58,8 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
       post: updatedPost,
     });
   } catch (err: any) {
+    err.message = "Post ID was not reconized";
+    err.statusCode = 404;
     next(err);
   }
 };
@@ -61,7 +70,6 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
     const post = await Post.findById(postId);
     if (!post) {
       const error = new Error("Failed to find Post with matching Id");
-      //   error.statusCode = 404;
       throw error;
     }
     const result = await Post.findByIdAndRemove(postId);
@@ -69,7 +77,9 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
       message: "Posted Deleted From database",
       postRemoved: result,
     });
-  } catch (err) {
+  } catch (err: any) {
+    err.message = "Failed to find Post with matching ID";
+    err.statusCode = 404;
     next(err);
   }
 };
