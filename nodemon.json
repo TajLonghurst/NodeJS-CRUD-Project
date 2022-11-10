@@ -1,0 +1,7 @@
+{
+  "env": {
+    "DB_PASSWORD": "Password123",
+    "DB_USERNAME": "Taj",
+    "MONGODB_DB": "post"
+  }
+}
