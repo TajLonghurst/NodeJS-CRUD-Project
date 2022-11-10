@@ -3,12 +3,12 @@ import postController from "../controllers/postController";
 
 const routes = express.Router();
 
-routes.get("/posts", postController.getPosts);
+routes.get("/", postController.getPosts);
 
-routes.post("/post/add/:postId", postController.addPost);
+routes.post("/add", postController.addPost);
 
-routes.put("/post/edit/:postId", postController.editPost);
+routes.put("/edit/:postId", postController.editPost);
 
-routes.delete("/post/delete/:postId", postController.deletePost);
+routes.delete("/delete/:postId", postController.deletePost);
 
 export default routes;

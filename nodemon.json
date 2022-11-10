@@ -2,6 +2,7 @@
   "env": {
     "DB_PASSWORD": "Password123",
     "DB_USERNAME": "Taj",
-    "MONGODB_DB": "post"
+    "MONGODB_DB": "post",
+    "PORT": "5000"
   }
 }
