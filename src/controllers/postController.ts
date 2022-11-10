@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Post from "../models/postModel";
+import User from "../models/userModel";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -20,14 +21,21 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, imageUrl, content, creator } = req.body;
+    const { title, imageUrl, content, creator: userId } = req.body;
     const post = new Post({
       title: title,
       imageUrl: imageUrl,
       content: content,
-      creator: creator,
+      creator: userId,
     });
     const createdPost = await post.save();
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error("Could not userId to add to newly created post");
+      throw error;
+    }
+    user.posts.push(post);
+    await user.save();
     res.status(201).json({
       post: createdPost,
     });
@@ -73,6 +81,14 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
       throw error;
     }
     const result = await Post.findByIdAndRemove(postId);
+    const user = await User.findById(""); //Need to find the correct userID
+    console.log(user);
+    if (!user) {
+      const error = new Error("Failed to find user with matching Id");
+      throw error;
+    }
+    user.posts.pull(postId);
+    await user.save();
     res.status(200).json({
       message: "Posted Deleted From database",
       postRemoved: result,

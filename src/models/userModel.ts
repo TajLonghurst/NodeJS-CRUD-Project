@@ -1,11 +1,12 @@
 import mongoose, { Schema, model, Document } from "mongoose";
+import { postModel } from "./postModel";
 
 export interface user {
   name: string;
   age: number;
   email: string;
   password: string;
-  posts: [];
+  posts: mongoose.Types.Array<postModel>;
 }
 
 export interface userModel extends user, Document {}
