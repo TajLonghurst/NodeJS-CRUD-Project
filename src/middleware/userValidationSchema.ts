@@ -22,7 +22,12 @@ export const userSchemas = {
         .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "nz"] } })
         .required(),
       password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{6,}$")).required(),
-      //posts:
+    }),
+    login: Joi.object<user>({
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "nz"] } })
+        .required(),
+      password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{6,}$")).required(),
     }),
   },
 };

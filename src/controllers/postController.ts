@@ -75,13 +75,14 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
 const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const postId = req.params.postId;
+    // const userId = req.userId;
     const post = await Post.findById(postId);
     if (!post) {
       const error = new Error("Failed to find Post with matching Id");
       throw error;
     }
     const result = await Post.findByIdAndRemove(postId);
-    const user = await User.findById("636cfca2a367346c8e4f96e7"); //Need to find the correct userID. Need to watch the Udemy Video for why he uses Req.userId
+    const user = await User.findById(req.userId); //Need to find the correct userID. Need to watch the Udemy Video for why he uses Req.userId
     console.log(user);
     if (!user) {
       const error = new Error("Failed to find user with matching Id");

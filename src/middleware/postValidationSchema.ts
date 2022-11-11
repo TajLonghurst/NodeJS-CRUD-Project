@@ -20,7 +20,7 @@ export const postSchemas = {
       imageUrl: Joi.string().required(),
       content: Joi.string().required(),
       creator: Joi.string()
-        .regex(/^[0.9a-fA-F]{24}$/)
+        .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
     }),
     update: Joi.object<post>({
@@ -28,7 +28,7 @@ export const postSchemas = {
       imageUrl: Joi.string().required(),
       content: Joi.string().required(),
       creator: Joi.string()
-        .regex(/^[0.9a-fA-F]{24}$/)
+        .regex(/^[0-9a-fA-F]{24}$/)
         .required(),
     }),
   },

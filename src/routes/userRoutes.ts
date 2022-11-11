@@ -8,7 +8,10 @@ const routes = express.Router();
 routes.get("/", userController.getUsers);
 
 //http://localhost:5000/api/user/1
-routes.get("/:userId", userController.getSingleUsers);
+routes.get("/:userId", userController.getSingleUser);
+
+//http://localhost:5000/api/user/login
+routes.post("/login", userValidationSchema(userSchemas.user.login), userController.loginUser);
 
 //http://localhost:5000/api/user/add
 routes.post("/create", userValidationSchema(userSchemas.user.create), userController.createUser);

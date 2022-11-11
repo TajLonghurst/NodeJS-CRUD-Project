@@ -3,6 +3,7 @@
     "DB_PASSWORD": "Password123",
     "DB_USERNAME": "Taj",
     "MONGODB_DB": "Media",
-    "PORT": "5000"
+    "PORT": "5000",
+    "JWT_SECRET": "SecretJWTSecret"
   }
 }

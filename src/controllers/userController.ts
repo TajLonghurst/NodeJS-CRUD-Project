@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import User, { userModel } from "../models/userModel";
+import jwt from "jsonwebtoken";
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,7 +19,7 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getSingleUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.params.userId;
     const user = await User.findById(userId);
@@ -31,6 +32,32 @@ const getSingleUsers = async (req: Request, res: Response, next: NextFunction) =
     });
   } catch (err: any) {
     err.message = "Failed to find user";
+    err.statusCode = 404;
+    next(err);
+  }
+};
+
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      const error = new Error("User with this email could not be found");
+      throw error;
+    }
+    if (password !== user.password) {
+      const error = new Error("User with this password is incorrect");
+      throw error;
+    }
+    const token = jwt.sign({ email: email, userId: user._id }, `${process.env.JWT_SECRET}`, {
+      expiresIn: "1h",
+    });
+    res.status(200).json({
+      token: token,
+      userId: user._id.toString(),
+    });
+  } catch (err: any) {
+    err.message = "Failed to find matching email";
     err.statusCode = 404;
     next(err);
   }
@@ -76,4 +103,4 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default { getUsers, getSingleUsers, createUser, deleteUser };
+export default { getUsers, getSingleUser, createUser, deleteUser, loginUser };
