@@ -1,5 +1,6 @@
 import express from "express";
 import postController from "../controllers/postController";
+import { postSchemas, postValidationSchema } from "../middleware/postValidationSchema";
 
 const routes = express.Router();
 
@@ -7,10 +8,14 @@ const routes = express.Router();
 routes.get("/", postController.getPosts);
 
 //http://localhost:5000/api/post/add
-routes.post("/create", postController.createPost);
+routes.post("/create", postValidationSchema(postSchemas.post.create), postController.createPost);
 
 //http://localhost:5000/api/post/edit/1
-routes.put("/update/:postId", postController.updatePost);
+routes.put(
+  "/update/:postId",
+  postValidationSchema(postSchemas.post.update),
+  postController.updatePost
+);
 
 //http://localhost:5000/api/post/delete/1
 routes.delete("/delete/:postId", postController.deletePost);
