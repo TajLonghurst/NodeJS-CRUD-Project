@@ -1,6 +1,7 @@
 import express from "express";
 import postController from "../controllers/postController";
 import { postSchemas, postValidationSchema } from "../middleware/postValidationSchema";
+import postAuth from "../middleware/Is-Auth";
 
 const routes = express.Router();
 
@@ -18,6 +19,6 @@ routes.put(
 );
 
 //http://localhost:5000/api/post/delete/1
-routes.delete("/delete/:postId", postController.deletePost);
+routes.delete("/delete/:postId", postAuth, postController.deletePost);
 
 export default routes;

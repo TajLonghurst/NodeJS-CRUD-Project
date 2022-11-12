@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { ExtendedRequest } from "../middleware/Is-Auth";
 import Post from "../models/postModel";
 import User from "../models/userModel";
 
@@ -72,7 +73,7 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const deletePost = async (req: Request, res: Response, next: NextFunction) => {
+const deletePost = async (req: ExtendedRequest, res: Response, next: NextFunction) => {
   try {
     const postId = req.params.postId;
     // const userId = req.userId;
