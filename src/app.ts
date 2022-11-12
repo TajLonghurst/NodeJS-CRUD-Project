@@ -36,3 +36,5 @@ mongoose
   .catch((err) => {
     console.log("MongoDB Connection Failed", err);
   });
+
+//Add proper error responses to client
