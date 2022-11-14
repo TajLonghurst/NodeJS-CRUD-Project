@@ -16,7 +16,11 @@ export const userValidationSchema = (schema: ObjectSchema) => {
 export const userSchemas = {
   user: {
     create: Joi.object<user>({
-      name: Joi.string().required(),
+      name: Joi.string().required().messages({
+        "string.base": `"Name" should be a type of 'Charaters'`,
+        "string.empty": `"Name" cannot be an empty field`,
+        "any.required": `"Name" is a required field`,
+      }),
       age: Joi.number().required(),
       email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "nz"] } })

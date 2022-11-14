@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User, { userModel } from "../models/userModel";
+import User from "../models/userModel";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,8 +46,9 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
       const error = new Error("User with this email could not be found");
       throw error;
     }
-    if (password !== user.password) {
-      const error = new Error("User with this password is incorrect");
+    const isEqual = await bcrypt.compare(password, user.password);
+    if (!isEqual) {
+      const error = new Error("Wront password");
       throw error;
     }
     const token = jwt.sign({ email: email, userId: user._id }, `${process.env.JWT_SECRET}`, {
@@ -66,11 +68,14 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, age, email, password } = req.body;
+
+    const hashPassword = await bcrypt.hash(password, 12);
+
     const user = new User({
       name: name,
       age: age,
       email: email,
-      password: password,
+      password: hashPassword,
     });
     const createdUser = await user.save();
     res.status(201).json({
