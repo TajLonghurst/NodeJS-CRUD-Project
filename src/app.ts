@@ -1,8 +1,7 @@
-import express, { Request, ErrorRequestHandler } from "express";
+import express, { Request, ErrorRequestHandler, NextFunction } from "express";
 import postRoutes from "./routes/postRoute";
 import userRoutes from "./routes/userRoutes";
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
 
@@ -13,7 +12,7 @@ const fileStorage = multer.diskStorage({
     cb(null, "src/images");
   },
   filename: (req, file, cb) => {
-    cb(null, uuidv4() + "-" + file.originalname);
+    // cb(null, uuidv4() + "-" + file.originalname);
   },
 });
 
