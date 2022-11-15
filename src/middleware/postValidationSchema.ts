@@ -17,7 +17,7 @@ export const postSchemas = {
   post: {
     create: Joi.object<post>({
       title: Joi.string().required(),
-      imageUrl: Joi.string().required(),
+      //imageUrl: Joi.required(),
       content: Joi.string().required(),
       creator: Joi.string()
         .regex(/^[0-9a-fA-F]{24}$/)
@@ -25,7 +25,7 @@ export const postSchemas = {
     }),
     update: Joi.object<post>({
       title: Joi.string().required(),
-      imageUrl: Joi.string().required(),
+      //imageUrl: Joi.required(),
       content: Joi.string().required(),
       creator: Joi.string()
         .regex(/^[0-9a-fA-F]{24}$/)

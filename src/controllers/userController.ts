@@ -74,7 +74,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const user = new User({
       name: name,
       age: age,
-      email: email,
+      email: email.toLowerCase(),
       password: hashPassword,
     });
     const createdUser = await user.save();

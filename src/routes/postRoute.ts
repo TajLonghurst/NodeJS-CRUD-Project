@@ -9,11 +9,17 @@ const routes = express.Router();
 routes.get("/", postController.getPosts);
 
 //http://localhost:5000/api/post/add
-routes.post("/create", postValidationSchema(postSchemas.post.create), postController.createPost);
+routes.post(
+  "/create",
+  postAuth,
+  postValidationSchema(postSchemas.post.create),
+  postController.createPost
+);
 
 //http://localhost:5000/api/post/edit/1
 routes.put(
   "/update/:postId",
+  postAuth,
   postValidationSchema(postSchemas.post.update),
   postController.updatePost
 );

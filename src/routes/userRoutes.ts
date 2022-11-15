@@ -1,6 +1,7 @@
 import express from "express";
 import userController from "../controllers/userController";
 import { userSchemas, userValidationSchema } from "../middleware/userValidationSchema";
+import postAuth from "../middleware/Is-Auth";
 
 const routes = express.Router();
 
@@ -17,6 +18,6 @@ routes.post("/login", userValidationSchema(userSchemas.user.login), userControll
 routes.post("/create", userValidationSchema(userSchemas.user.create), userController.createUser);
 
 //http://localhost:5000/api/user/delete/1
-routes.delete("/delete/:postId", userController.deleteUser);
+routes.delete("/delete/:postId", postAuth, userController.deleteUser);
 
 export default routes;

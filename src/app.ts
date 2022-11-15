@@ -1,11 +1,39 @@
-import express, { ErrorRequestHandler } from "express";
+import express, { Request, ErrorRequestHandler } from "express";
 import postRoutes from "./routes/postRoute";
 import userRoutes from "./routes/userRoutes";
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
+import multer, { FileFilterCallback } from "multer";
+import path from "path";
 
 const app = express();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "src/images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuidv4() + "-" + file.originalname);
+  },
+});
+
+//new Date().toISOString().replace(/:/g, '-')
+
+const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(express.json());
+app.use("src/images", express.static(path.join(__dirname, "src/images")));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("imageUrl"));
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {

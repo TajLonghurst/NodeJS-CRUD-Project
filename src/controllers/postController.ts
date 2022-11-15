@@ -22,7 +22,12 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, imageUrl, content, creator: userId } = req.body;
+    const imageUrl = req.file?.path.replace("\\", "/");
+    if (!imageUrl) {
+      const error = new Error("Could not find file");
+      throw error;
+    }
+    const { title, content, creator: userId } = req.body;
     const post = new Post({
       title: title,
       imageUrl: imageUrl,
