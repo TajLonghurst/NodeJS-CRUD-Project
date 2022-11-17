@@ -1,9 +1,10 @@
-import express, { Request, ErrorRequestHandler, NextFunction } from "express";
+import express, { Request, ErrorRequestHandler } from "express";
 import postRoutes from "./routes/postRoute";
 import userRoutes from "./routes/userRoutes";
 import mongoose from "mongoose";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 
@@ -12,11 +13,9 @@ const fileStorage = multer.diskStorage({
     cb(null, "src/images");
   },
   filename: (req, file, cb) => {
-    // cb(null, uuidv4() + "-" + file.originalname);
+    cb(null, uuidv4() + "-" + file.originalname);
   },
 });
-
-//new Date().toISOString().replace(/:/g, '-')
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
   if (
@@ -27,11 +26,12 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
     cb(null, true);
   } else {
     cb(null, false);
+    return cb(new Error("Only .png .jpg and jpeg images allowed"));
   }
 };
 
 app.use(express.json());
-app.use("src/images", express.static(path.join(__dirname, "src/images")));
+app.use("images", express.static(path.join(__dirname, "images")));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("imageUrl"));
 app.use(express.urlencoded({ extended: false }));
 
@@ -65,3 +65,4 @@ mongoose
   });
 
 //Add proper error responses to client
+//Add check an email doesnt already exsist

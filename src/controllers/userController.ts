@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
+import { clearImage } from "../middleware/clearImages";
 import User from "../models/userModel";
+import Post from "../models/postModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -79,6 +81,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     });
     const createdUser = await user.save();
     res.status(201).json({
+      message: "Created Succsefully",
       user: createdUser,
     });
   } catch (err: any) {
@@ -93,16 +96,42 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.postId;
     const user = await User.findById(userId);
     if (!user) {
-      const error = new Error("Failed to find Post with matching Id");
+      const error = new Error("Failed to find User with matching Id");
       throw error;
     }
+
+    const userPostIds = [...user.posts];
+
+    const postImages = await Post.find({ _id: { $in: userPostIds } });
+
+    if (!postImages) {
+      const error = new Error("Failed to find Posts with matching IDs");
+      throw error;
+    }
+
+    const images = postImages.map((img) => {
+      return img.imageUrl;
+    });
+
+    clearImage(images);
+
+    const posts = await Post.deleteMany({
+      _id: { $in: userPostIds },
+    });
+
+    if (!posts) {
+      const error = new Error("Failed to find Posts with matching IDs");
+      throw error;
+    }
+
     const result = await User.findByIdAndRemove(userId);
     res.status(200).json({
       message: "User Deleted From database",
       userRemoved: result,
+      postsRemoved: posts,
     });
   } catch (err: any) {
-    err.message = "Failed to find User with matching ID";
+    err.message = "deleteUser Controller Failed";
     err.statusCode = 404;
     next(err);
   }

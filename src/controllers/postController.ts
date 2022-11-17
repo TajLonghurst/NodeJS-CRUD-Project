@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ExtendedRequest } from "../middleware/Is-Auth";
 import Post from "../models/postModel";
 import User from "../models/userModel";
+import { clearImage } from "../middleware/clearImages";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -55,11 +56,22 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
 const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const postId = req.params.postId;
-    const { title, imageUrl, content, creator } = req.body;
+    const { title, content, creator } = req.body;
+    let imageUrl = req.body.imageUrl;
+    if (req.file) {
+      imageUrl = req.file.path;
+    }
+    if (!imageUrl) {
+      const error = new Error("Image was not picked");
+      throw error;
+    }
     const post = await Post.findById(postId);
     if (!post) {
       const error = new Error("updatePost Controller Could not find postId");
       throw error;
+    }
+    if (imageUrl !== post.imageUrl) {
+      clearImage([post.imageUrl]);
     }
     post.set({
       title: title,
@@ -81,15 +93,14 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
 const deletePost = async (req: ExtendedRequest, res: Response, next: NextFunction) => {
   try {
     const postId = req.params.postId;
-    // const userId = req.userId;
     const post = await Post.findById(postId);
     if (!post) {
       const error = new Error("Failed to find Post with matching Id");
       throw error;
     }
+    clearImage([post.imageUrl]);
     const result = await Post.findByIdAndRemove(postId);
-    const user = await User.findById(req.userId); //Need to find the correct userID. Need to watch the Udemy Video for why he uses Req.userId
-    console.log(user);
+    const user = await User.findById(req.userId);
     if (!user) {
       const error = new Error("Failed to find user with matching Id");
       throw error;
