@@ -70,7 +70,12 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, age, email, password } = req.body;
-
+    const doesExsist = await User.findOne({ email: email.toLowerCase() });
+    if (doesExsist) {
+      return res.status(409).json({
+        message: "Email Already exists",
+      });
+    }
     const hashPassword = await bcrypt.hash(password, 12);
 
     const user = new User({
