@@ -107,14 +107,14 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const userPostIds = [...user.posts];
 
-    const postImages = await Post.find({ _id: { $in: userPostIds } });
+    const userPosts = await Post.find({ _id: { $in: userPostIds } });
 
-    if (!postImages) {
+    if (!userPosts) {
       const error = new Error("Failed to find Posts with matching IDs");
       throw error;
     }
 
-    const images = postImages.map((img) => {
+    const images = userPosts.map((img) => {
       return img.imageUrl;
     });
 
