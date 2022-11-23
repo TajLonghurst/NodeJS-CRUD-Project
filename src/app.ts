@@ -10,7 +10,7 @@ const app = express();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./images"); //In deveploment do /src/images but in deploy do /images
+    cb(null, "src/images");
   },
   filename: (req, file, cb) => {
     cb(null, uuidv4() + "-" + file.originalname);
