@@ -24,6 +24,15 @@ The purpose of this project is to understand NodeJS along with express by creati
 
 ## USER APIS
 
+## Deployment
+
+To deploy this project run
+
+```bash
+  npm install
+  npm run dev
+```
+
 #### Get all users
 
 ```http
