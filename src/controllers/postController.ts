@@ -49,7 +49,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
     });
   } catch (err: any) {
     if (err instanceof mongoose.Error.CastError) {
-      next(createError(404, "could not find user"));
+      next(createError(404, "could not create post"));
       return;
     }
     next(err);

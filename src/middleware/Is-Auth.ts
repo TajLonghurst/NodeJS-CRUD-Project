@@ -31,6 +31,7 @@ export default async (req: ExtendedRequest, res: Response, next: NextFunction) =
       throw createError(401, "Falied to decode Token");
     }
     req.userId = decodeToken.userId;
+    next();
   } catch (err) {
     next(err);
   }
