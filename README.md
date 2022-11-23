@@ -77,8 +77,6 @@ The purpose of this project is to understand NodeJS along with express by creati
 
 ## POST APIS
 
-## API Reference
-
 #### Get all posts
 
 ```http
