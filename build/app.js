@@ -15,7 +15,7 @@ const uuid_1 = require("uuid");
 const app = (0, express_1.default)();
 const fileStorage = multer_1.default.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "build/images");
+    cb(null, "images");
   },
   filename: (req, file, cb) => {
     cb(null, (0, uuid_1.v4)() + "-" + file.originalname);
