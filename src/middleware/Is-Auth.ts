@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import createError from "http-errors";
 
 export interface ExtendedRequest extends Request {
   userId?: string | JwtPayload;
@@ -19,20 +20,18 @@ export default async (req: ExtendedRequest, res: Response, next: NextFunction) =
     const token = req.get("Authorization")?.replace(/^Bearer\s/, "");
 
     if (!token) {
-      return next();
+      throw createError(400, "failed to find Bearer token");
     }
 
     const decodeToken = <jwt.ExtendedJwtPayload>jwt.verify(token, `${process.env.JWT_SECRET}`);
 
-    console.log(decodeToken);
+    console.log("decode Token", decodeToken);
 
     if (!decodeToken) {
-      const error = new Error("Falied to decode Token ");
-      throw error;
+      throw createError(401, "Falied to decode Token");
     }
     req.userId = decodeToken.userId;
-    next();
   } catch (err) {
-    throw err;
+    next(err);
   }
 };

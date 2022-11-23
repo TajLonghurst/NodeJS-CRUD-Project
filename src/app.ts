@@ -47,9 +47,14 @@ app.use("/api/user", userRoutes);
 
 app.use(((err, req, res, next) => {
   console.log(err);
-  const status = err.statusCode || 500;
+  const status = err.status || 500;
   const message = err.message;
-  res.status(status).json({ message: message });
+  res.status(status).json({
+    error: {
+      status: status,
+      message: message,
+    },
+  });
 }) as ErrorRequestHandler);
 
 mongoose
@@ -63,6 +68,3 @@ mongoose
   .catch((err) => {
     console.log("MongoDB Connection Failed", err);
   });
-
-//Add proper error responses to client
-//Add check an email doesnt already exsist

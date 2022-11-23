@@ -4,20 +4,23 @@ import User from "../models/userModel";
 import Post from "../models/postModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import createError from "http-errors";
+import mongoose from "mongoose";
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find();
     if (!users) {
-      const error = new Error("Could not find users");
-      throw error;
+      throw createError(404, "Failed to find user");
     }
     res.status(200).json({
       users: users,
     });
   } catch (err: any) {
-    err.message = "Failed to find users";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to find user"));
+      return;
+    }
     next(err);
   }
 };
@@ -27,15 +30,16 @@ const getSingleUser = async (req: Request, res: Response, next: NextFunction) =>
     const userId = req.params.userId;
     const user = await User.findById(userId);
     if (!user) {
-      const error = new Error("Could not find user");
-      throw error;
+      throw createError(404, "Failed to find user");
     }
     res.status(200).json({
       user: user,
     });
   } catch (err: any) {
-    err.message = "Failed to find user";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to find user"));
+      return;
+    }
     next(err);
   }
 };
@@ -45,13 +49,11 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      const error = new Error("User with this email could not be found");
-      throw error;
+      throw createError(404, "User with this email could not be found");
     }
     const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {
-      const error = new Error("Wront password");
-      throw error;
+      throw createError(404, "Password decrypt faileds");
     }
     const token = jwt.sign({ email: email, userId: user._id }, `${process.env.JWT_SECRET}`, {
       expiresIn: "1h",
@@ -61,8 +63,10 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
       userId: user._id.toString(),
     });
   } catch (err: any) {
-    err.message = "Failed to find matching email";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to find matching email"));
+      return;
+    }
     next(err);
   }
 };
@@ -72,9 +76,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const { name, age, email, password } = req.body;
     const doesExsist = await User.findOne({ email: email.toLowerCase() });
     if (doesExsist) {
-      return res.status(409).json({
-        message: "Email Already exists",
-      });
+      throw createError(409, "Email already exsits");
     }
     const hashPassword = await bcrypt.hash(password, 12);
 
@@ -90,8 +92,10 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       user: createdUser,
     });
   } catch (err: any) {
-    err.message = "Failed to Create User";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to create user"));
+      return;
+    }
     next(err);
   }
 };
@@ -110,8 +114,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userPosts = await Post.find({ _id: { $in: userPostIds } });
 
     if (!userPosts) {
-      const error = new Error("Failed to find Posts with matching IDs");
-      throw error;
+      throw createError(404, "Failed to find Posts with matching IDs");
     }
 
     const images = userPosts.map((img) => {
@@ -125,19 +128,20 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     if (!posts) {
-      const error = new Error("Failed to find Posts with matching IDs");
-      throw error;
+      throw createError(404, "Failed to delete posts with matching user ID");
     }
 
     const result = await User.findByIdAndRemove(userId);
     res.status(200).json({
-      message: "User Deleted From database",
+      message: "User succsfully deleted From database",
       userRemoved: result,
       postsRemoved: posts,
     });
   } catch (err: any) {
-    err.message = "deleteUser Controller Failed";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to delete user"));
+      return;
+    }
     next(err);
   }
 };

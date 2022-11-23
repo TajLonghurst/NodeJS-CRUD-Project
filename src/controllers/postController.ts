@@ -3,20 +3,23 @@ import { ExtendedRequest } from "../middleware/Is-Auth";
 import Post from "../models/postModel";
 import User from "../models/userModel";
 import { clearImage } from "../middleware/clearImages";
+import createError from "http-errors";
+import mongoose from "mongoose";
 
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const posts = await Post.find();
     if (!posts) {
-      const error = new Error("Could not find posts");
-      throw error;
+      throw createError(404, "Failed to find posts");
     }
     res.status(200).json({
       posts: posts,
     });
   } catch (err: any) {
-    err.message = "Failed to find posts";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to find posts"));
+      return;
+    }
     next(err);
   }
 };
@@ -25,8 +28,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const imageUrl = req.file?.path.replace("\\", "/");
     if (!imageUrl) {
-      const error = new Error("Could not find file");
-      throw error;
+      throw createError(404, "Could not find file");
     }
     const { title, content, creator: userId } = req.body;
     const post = new Post({
@@ -38,8 +40,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
     const createdPost = await post.save();
     const user = await User.findById(userId);
     if (!user) {
-      const error = new Error("Could not userId to add to newly created post");
-      throw error;
+      throw createError(404, "Could not find user");
     }
     user.posts.push(post);
     await user.save();
@@ -47,8 +48,10 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
       post: createdPost,
     });
   } catch (err: any) {
-    err.message = "Failed to Create Post";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "could not find user"));
+      return;
+    }
     next(err);
   }
 };
@@ -62,13 +65,11 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
       imageUrl = req.file.path;
     }
     if (!imageUrl) {
-      const error = new Error("Image was not picked");
-      throw error;
+      throw createError(404, "Image was not picked");
     }
     const post = await Post.findById(postId);
     if (!post) {
-      const error = new Error("updatePost Controller Could not find postId");
-      throw error;
+      throw createError(404, "Could not find ID");
     }
     if (imageUrl !== post.imageUrl) {
       clearImage([post.imageUrl]);
@@ -84,8 +85,10 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
       post: updatedPost,
     });
   } catch (err: any) {
-    err.message = "Post ID was not reconized";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Post ID was not reconized"));
+      return;
+    }
     next(err);
   }
 };
@@ -95,15 +98,13 @@ const deletePost = async (req: ExtendedRequest, res: Response, next: NextFunctio
     const postId = req.params.postId;
     const post = await Post.findById(postId);
     if (!post) {
-      const error = new Error("Failed to find Post with matching Id");
-      throw error;
+      throw createError(404, "Failed to find Post with matching ID");
     }
     clearImage([post.imageUrl]);
     const result = await Post.findByIdAndRemove(postId);
     const user = await User.findById(req.userId);
     if (!user) {
-      const error = new Error("Failed to find user with matching Id");
-      throw error;
+      throw createError(404, "Failed to find User with matching ID");
     }
     user.posts.pull(postId);
     await user.save();
@@ -112,8 +113,10 @@ const deletePost = async (req: ExtendedRequest, res: Response, next: NextFunctio
       postRemoved: result,
     });
   } catch (err: any) {
-    err.message = "Failed to find Post with matching ID";
-    err.statusCode = 404;
+    if (err instanceof mongoose.Error.CastError) {
+      next(createError(404, "Failed to find Post with matching ID"));
+      return;
+    }
     next(err);
   }
 };
