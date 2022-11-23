@@ -86,7 +86,7 @@ The purpose of this project is to understand NodeJS along with express by creati
 #### Create Post
 
 ```http
-  GET /api/create/
+  GET /api/post/create/
 ```
 
 | Name           | Type     | Description           |
@@ -100,7 +100,7 @@ The purpose of this project is to understand NodeJS along with express by creati
 #### Create Post
 
 ```http
-  PUT /api/update/${postId}
+  PUT /api/post/update/${postId}
 ```
 
 | Name           | Type     | Description           |
