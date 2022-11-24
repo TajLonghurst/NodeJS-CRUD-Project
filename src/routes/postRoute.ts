@@ -16,7 +16,7 @@ routes.post(
   postController.createPost
 );
 
-//http://localhost:5000/api/post/edit/1
+//http://localhost:5000/api/post/update/
 routes.put(
   "/update/:postId",
   postAuth,
