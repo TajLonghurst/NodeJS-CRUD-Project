@@ -1,0 +1,1 @@
+This file is purply so Copyfiles npm package can copy the "Image" Folder. So on deployment there is a place for multer to store images in an "images" folder.

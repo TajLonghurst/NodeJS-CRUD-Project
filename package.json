@@ -7,10 +7,12 @@
     "node": "14.x"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node build/app.js",
+    "dev": "nodemon --exec ts-node src/app.ts",
     "build": "tsc",
-    "dev": "nodemon --exec ts-node src/app.ts"
+    "copyFiles": "copyfiles --error -u 1 src/images/*.* build",
+    "postbuild": "npm run copyFiles",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,7 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^18.11.9",
     "@types/uuid": "^8.3.4",
+    "copyfiles": "^2.4.1",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
