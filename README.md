@@ -26,6 +26,10 @@ The purpose of this project is to understand NodeJS along with express by creati
 
 ## Deployment
 
+```http
+  https://nodejs-crud-project.up.railway.app/
+```
+
 To deploy this project run
 
 ```bash
